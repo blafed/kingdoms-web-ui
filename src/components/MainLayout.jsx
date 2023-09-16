@@ -1,12 +1,8 @@
 import React, { Fragment } from "react"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
-import {
-  Bars3Icon,
-  BellIcon,
-  HomeIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline"
+import { Bars3Icon, HomeIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import { useLocation } from "react-router-dom"
+import Sidebar from "./SidebarLayout"
 
 const user = {
   name: "Tom Cook",
@@ -114,38 +110,40 @@ export default function MainLayout({ children = null }) {
 
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item) => (
-                          <a
-                            key={item.name}
-                            href={item.href}
-                            className={classNames(
-                              item.current
-                                ? "bg-gray-900 text-white"
-                                : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                              "rounded-md px-3 py-2 text-sm font-medium"
-                            )}
-                            aria-current={item.current ? "page" : undefined}
-                          >
-                            {item.name}
-                          </a>
-                        ))}
+                        {navigation.map((item) =>
+                          item.hidden ? null : (
+                            <a
+                              key={item.name}
+                              href={item.href}
+                              className={classNames(
+                                item.current
+                                  ? "bg-gray-900 text-white"
+                                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                "rounded-md px-3 py-2 text-sm font-medium"
+                              )}
+                              aria-current={item.current ? "page" : undefined}
+                            >
+                              {item.name}
+                            </a>
+                          )
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-4 flex items-center md:ml-6">
-                      <button
+                      {/* <button
                         type="button"
                         className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       >
                         <span className="absolute -inset-1.5" />
                         <span className="sr-only">View notifications</span>
                         <BellIcon className="h-6 w-6" aria-hidden="true" />
-                      </button>
+                      </button> */}
 
                       {/* Profile dropdown */}
                       <Menu as="div" className="relative ml-3">
-                        <div>
+                        {/* <div>
                           <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                             <span className="absolute -inset-1.5" />
                             <span className="sr-only">Open user menu</span>
@@ -155,7 +153,7 @@ export default function MainLayout({ children = null }) {
                               alt=""
                             />
                           </Menu.Button>
-                        </div>
+                        </div> */}
                         <Transition
                           as={Fragment}
                           enter="transition ease-out duration-100"
