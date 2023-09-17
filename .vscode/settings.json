@@ -9,5 +9,6 @@
     "node_modules": true,
     "build": true
   },
-  "editor.formatOnType": false
+  "editor.formatOnType": false,
+  "emmet.excludeLanguages": ["javascript"]
 }

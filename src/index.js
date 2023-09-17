@@ -11,48 +11,12 @@ import ItemsPage from "./pages/ItemsPage"
 import TrainablesPage from "./pages/TrainablesPage"
 import FactionsPage from "./pages/FactionsPage"
 import ResourcesPage from "./pages/ResourcesPage"
+import App from "./App"
 const root = ReactDOM.createRoot(document.getElementById("root"))
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/buildings",
-    element: <BuildingsPage />,
-  },
-
-  {
-    path: "/artifacts",
-    element: <ArtifactsPage />,
-  },
-
-  {
-    path: "commodities",
-    element: <CommoditiesPage />,
-  },
-  {
-    path: "items",
-    element: <ItemsPage />,
-  },
-
-  {
-    path: "trainables",
-    element: <TrainablesPage />,
-  },
-  {
-    path: "factions",
-    element: <FactionsPage />,
-  },
-  {
-    path: "resources",
-    element: <ResourcesPage />,
-  },
-])
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <App />
   </React.StrictMode>
 )
 

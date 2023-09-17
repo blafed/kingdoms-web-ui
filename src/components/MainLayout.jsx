@@ -1,8 +1,8 @@
-import React, { Fragment } from "react"
+import React, { Fragment, useState } from "react"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
 import { Bars3Icon, HomeIcon, XMarkIcon } from "@heroicons/react/24/outline"
-import { useLocation } from "react-router-dom"
 import Sidebar from "./SidebarLayout"
+import { useBasics } from "./BasicsProvider"
 
 const user = {
   name: "Tom Cook",
@@ -16,62 +16,31 @@ function classNames(...classes) {
 }
 
 export default function MainLayout({ children = null }) {
-  const { pathname } = useLocation()
-  const navigation = [
+  const categories = useBasics().entityCategories
+
+  const [selected, setSelected] = useState(0)
+
+  let navigation = categories.map((x) => {
+    return {
+      name: x.displayName,
+      current: false,
+      desc: x.description,
+    }
+  })
+
+  navigation = [
     {
       notitle: true,
       hidden: true,
       name: "Home",
-      href: "/",
       current: true,
       desc: "A tool to edit the stats of the game",
       Icon: HomeIcon,
     },
-    {
-      name: "Resources",
-      href: "/resources",
-      current: false,
-      desc: "Resources is numeric values, they can be increased or decreased, they are used for lots of purposes and programmed mechanics. like currencies, attack, defense, etc..",
-    },
-    {
-      name: "Factions",
-      href: "/factions",
-      current: true,
-      desc: "Each Kingdom has a faction. Each faction has different boosts on its resources, and can access unique buildings and troops",
-    },
-    {
-      name: "Buildings",
-      href: "/buildings",
-      current: false,
-      desc: "Buildings can train troops and increase the resources of kingdom",
-    },
-    {
-      name: "Trinables",
-      href: "/trainables",
-      current: false,
-      desc: "Trainables are the any kind of troops that can be trained in the buildings.",
-    },
-    {
-      name: "Commodities",
-      href: "/commodities",
-      current: false,
-      desc: "Commodities are anything can be purchased, either virtual currency or real money.",
-    },
-    {
-      name: "Items",
-      href: "/items",
-      current: false,
-      desc: "Items are anything the kingdom can be own, includes spells, magic items, awards",
-    },
-    {
-      name: "Artifacts",
-      href: "/artifacts",
-      current: false,
-      desc: "Artifacts can effect the kingdom resources, they can give positive or negative effect, they can work like spells. They are not purchased, but they are a result of using items or an event occured",
-    },
+    ...navigation,
   ]
-  navigation.forEach((x) => (x.current = x.href === pathname))
-  let current = navigation.find((x) => x.current)
+  navigation.forEach((x, i) => (x.current = i == selected))
+  let current = navigation[selected]
   //   let desc = current.desc ?? ""
   let desc = current.desc
   console.log(current)
@@ -98,7 +67,7 @@ export default function MainLayout({ children = null }) {
                 <div className="flex h-16 items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <a href="/">
+                      <a href="#">
                         {" "}
                         <img
                           className="h-8 w-8"
@@ -110,11 +79,12 @@ export default function MainLayout({ children = null }) {
 
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item) =>
+                        {navigation.map((item, index) =>
                           item.hidden ? null : (
                             <a
+                              onClick={() => setSelected(index)}
                               key={item.name}
-                              href={item.href}
+                              href={"#"}
                               className={classNames(
                                 item.current
                                   ? "bg-gray-900 text-white"
@@ -279,8 +249,13 @@ export default function MainLayout({ children = null }) {
           </header>
         )}
         <main>
-          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-            {children}
+          {/* In tailwindcss generate a sidebar layout which will be appear in the left of the main content*/}
+
+          <div className="mx-auto ">
+            <div className="mx-auto"></div>
+            <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+              {children}
+            </div>
           </div>
         </main>
       </div>
