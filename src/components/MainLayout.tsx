@@ -2,8 +2,10 @@ import { AppBar, Box, Button, Toolbar } from "@mui/material"
 import CategoryView from "./CategoryView"
 import { CategoryData } from "../type"
 import { useEffect, useLayoutEffect, useState } from "react"
-import { apiUrl } from "../consts"
+import { apiUrl, noApi } from "../consts"
 import { createContext } from "react"
+import sampleData from "../sample-data"
+import sampleCategories from "../sample-categories"
 
 const mainContextDefaultValue = {
   categories: [] as CategoryData[],
@@ -25,9 +27,13 @@ export default function MainLayout() {
   const [categoryIndex, setCategoryIndex] = useState(0)
 
   useLayoutEffect(() => {
-    fetch(apiUrl + "info/categories")
-      .then((res) => res.json())
-      .then((data) => setCategories(data))
+    if (!noApi) {
+      fetch(apiUrl + "info/categories")
+        .then((res) => res.json())
+        .then((data) => setCategories(data))
+    } else {
+      setCategories(sampleCategories as CategoryData[])
+    }
   }, [])
 
   if (categories.length == 0) return <></>

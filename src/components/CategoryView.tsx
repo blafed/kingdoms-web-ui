@@ -16,10 +16,11 @@ import {
 } from "@mui/material"
 import { CategoryData, CategoryItem } from "../type"
 import { useContext, useEffect, useLayoutEffect, useState } from "react"
-import { apiUrl } from "../consts"
+import { apiUrl, noApi } from "../consts"
 import { Add, Delete } from "@mui/icons-material"
 import { MainLayoutContext } from "./MainLayout"
 import Details from "./Details"
+import sampleData from "../sample-data"
 export default function CategoryView(props: {
   hidden: boolean
   category: CategoryData
@@ -32,14 +33,30 @@ export default function CategoryView(props: {
   const items = props.category.items
 
   useLayoutEffect(() => {
-    fetch(apiUrl + "info/" + props.category.header.name)
-      .then((res) => res.json())
-      .then((data) => {
-        const categories = context.categories
-        const myCategoryIndex = categories.indexOf(props.category)
-        categories[myCategoryIndex].items = data
-        context.setCategories(categories)
-      })
+    if (!noApi) {
+      fetch(apiUrl + "info/" + props.category.header.name)
+        .then((res) => res.json())
+        .then((data) => {
+          const categories = context.categories
+          const myCategoryIndex = categories.indexOf(props.category)
+          categories[myCategoryIndex].items = data
+          context.setCategories(categories)
+        })
+    } else {
+      const categories = context.categories
+      const items = (sampleData as any)[
+        props.category.header.name + "s"
+      ] as CategoryItem[]
+
+      const myCategoryIndex = categories.indexOf(props.category)
+      categories[myCategoryIndex].items = items
+
+      const newCategories = [...categories]
+
+      newCategories[myCategoryIndex].items = items
+
+      context.setCategories(newCategories)
+    }
   }, [])
 
   const { category } = props
