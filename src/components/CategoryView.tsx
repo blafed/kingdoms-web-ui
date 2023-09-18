@@ -21,6 +21,7 @@ import { Add, Delete } from "@mui/icons-material"
 import { MainLayoutContext } from "./MainLayout"
 import Details from "./Details"
 import sampleData from "../sample-data"
+import { saveEnttiy } from "../func/entity"
 export default function CategoryView(props: {
   hidden: boolean
   category: CategoryData
@@ -117,10 +118,20 @@ function ItemsListView(props: {
   items: CategoryItem[]
   onSelect: (index: number) => void
 }) {
+  const mainContext = useContext(MainLayoutContext)
+  const handleSave = () => {
+    const cloneFrom = props.items[props.items.length - 1]
+    const newEntity = {
+      ...cloneFrom,
+      code: props.items.length,
+      name: cloneFrom.name + props.items.length,
+    }
+    saveEnttiy(newEntity, mainContext.categoryIndex, mainContext)
+  }
   return (
     <Paper sx={{ p: 1 }}>
       <Toolbar>
-        <Button variant="outlined" startIcon={<Add />}>
+        <Button onClick={handleSave} variant="outlined" startIcon={<Add />}>
           Add
         </Button>
         <Box flexGrow={1} />

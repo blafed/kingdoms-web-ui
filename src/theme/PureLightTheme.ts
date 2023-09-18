@@ -341,7 +341,8 @@ export const PureLightTheme = createTheme({
           textTransform: "none",
           marginLeft: 8,
           marginRight: 8,
-          fontWeight: "bold",
+          fontStyle: "italic",
+          // fontWeight: "bold",
         },
       },
     },
@@ -429,6 +430,17 @@ export const PureLightTheme = createTheme({
         },
         icon: {
           top: "calc(50% - 14px)",
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: "black",
+          fontWeight: "bold",
+        },
+        disabled: {
+          fontWeight: "bold",
         },
       },
     },

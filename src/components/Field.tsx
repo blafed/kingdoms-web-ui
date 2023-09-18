@@ -68,10 +68,32 @@ export default function Field(props: {
           onChange={(e) => setValue(e.target.value)}
         />
       )
+    // case FieldType.unique_name:
+    //   return (
+    //     <TextField
+    //       label={label}
+    //       helperText={field.help}
+    //       disabled
+    //       value={value}
+    //       onChange={(e) => setValue(e.target.value)}
+    //     />
+    //   )
 
     case FieldType.text:
       return (
         <TextField
+          label={label}
+          helperText={field.help}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      )
+
+    case FieldType.textarea:
+      return (
+        <TextField
+          multiline
+          minRows={2}
           label={label}
           helperText={field.help}
           value={value}

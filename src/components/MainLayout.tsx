@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Toolbar } from "@mui/material"
+import { AppBar, Box, Button, IconButton, Toolbar } from "@mui/material"
 import CategoryView from "./CategoryView"
 import { CategoryData } from "../type"
 import { useEffect, useLayoutEffect, useState } from "react"
@@ -6,8 +6,9 @@ import { apiUrl, noApi } from "../consts"
 import { createContext } from "react"
 import sampleData from "../sample-data"
 import sampleCategories from "../sample-categories"
+import { Help } from "@mui/icons-material"
 
-const mainContextDefaultValue = {
+export const mainContextDefaultValue = {
   categories: [] as CategoryData[],
   categoryIndex: 0,
   setCategoryIndex: (index: number) => {
@@ -18,6 +19,7 @@ const mainContextDefaultValue = {
     return
   },
 }
+export type MainContextType = typeof mainContextDefaultValue
 export const MainLayoutContext = createContext<typeof mainContextDefaultValue>(
   mainContextDefaultValue
 )
@@ -93,6 +95,12 @@ function MainBar(props: {
             )
           })}
         </Box>
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        <IconButton>
+          <Help />
+        </IconButton>
       </Toolbar>
     </AppBar>
   )
