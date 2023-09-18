@@ -13,12 +13,16 @@ import {
   Button,
   IconButton,
   Paper,
+  InputLabel,
+  FormControl,
+  Divider,
 } from "@mui/material"
 import { useContext, useState } from "react"
 import { FieldInfo, FieldType, EntityCategory } from "../type"
 import { CategoryItemContext } from "./Details"
 import { MainLayoutContext } from "./MainLayout"
-import { Delete } from "@mui/icons-material"
+import { Category, Delete } from "@mui/icons-material"
+import { randomString } from "../utils/stringUtils"
 
 export default function Field(props: {
   field: FieldInfo
@@ -76,16 +80,18 @@ export default function Field(props: {
       )
 
     case FieldType.entity_id: {
-      const categoryItems = categories.find(
-        (x) =>
-          x.header.name ==
-          EntityCategory[field?.entityCategory ?? 0].toLowerCase()
-      )?.items
+      const category = categories[field.entityCategory]
+      const categoryItems = category.items
+      console.log(field.entityCategory)
+      console.log(category)
 
+      const inputId = randomString(10)
       return (
-        <Box sx={{ width: 1 }}>
-          <Typography>{label}</Typography>
+        <FormControl sx={{ width: 1 }}>
+          <InputLabel id={inputId}>{label}</InputLabel>
           <Select
+            label={field.label}
+            labelId={inputId}
             fullWidth
             onChange={(e) => setValue(e.target.value)}
             value={value}
@@ -99,8 +105,8 @@ export default function Field(props: {
               </MenuItem>
             ))}
           </Select>
-          <Typography variant="subtitle1">{field.help}</Typography>
-        </Box>
+          <FormHelperText>{field.help}</FormHelperText>
+        </FormControl>
       )
     }
 
@@ -201,7 +207,7 @@ export default function Field(props: {
     case FieldType.rate:
       return (
         <TextField
-          label="Y"
+          label={label}
           type="number"
           value={value}
           onChange={(e) => setValue(parseFloat(e.target.value))}
@@ -257,6 +263,59 @@ export default function Field(props: {
         <ListField value={value} field={field} onChange={(v) => setValue(v)} />
       )
 
+    case FieldType.entity_quantity_gain:
+      return (
+        <Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Field
+              value={value.code}
+              onChange={(v) => setValue({ ...value, code: v })}
+              field={{
+                name: "",
+                label:
+                  categories[field?.entityCategory ?? -1]?.header.displayName,
+                type: FieldType.entity_id,
+                entityCategory: field.entityCategory,
+              }}
+            />
+
+            <Field
+              value={value.rate * 60}
+              onChange={(v) => setValue({ ...value, rate: v / 60 })}
+              field={{
+                name: "",
+                label: "Rate (per minute)",
+                type: FieldType.rate,
+              }}
+            />
+
+            <Field
+              value={value.limit}
+              onChange={(v) => setValue({ ...value, limit: v })}
+              field={{
+                name: "",
+                type: FieldType.integer,
+              }}
+            />
+
+            <Field
+              value={value.initialValue}
+              onChange={(v) => setValue({ ...value, initialValue: v })}
+              field={{
+                name: "",
+                type: FieldType.integer,
+              }}
+            />
+          </Box>
+        </Box>
+      )
+
     //     case FieldType.list:
     //       return (
     //         <Box sx={{}}>
@@ -286,13 +345,22 @@ function ListField(props: {
   const getLabel = (x: any) => {
     if (!field.listField) return "NO LIS TYPE"
     if (field.listField?.type == FieldType.entity_id) {
-      return EntityCategory[field.listField?.entityCategory ?? 1] + " " + x.code
+      const category = EntityCategory[field.listField?.entityCategory ?? 1]
+      const item = categories[field.listField.entityCategory].items?.[x] ?? null
+      if (item) return item.displayName
+      else return category
     }
     if (field.listField?.type == FieldType.entity_quantity) {
       const category = categories[field.listField.entityCategory]
       const item = category.items?.[x.code] ?? null
       if (item) return item.displayName + " " + x.quantity
-      else return category.header.displayName
+      else return "None"
+    }
+    if (field.listField?.type == FieldType.entity_quantity_gain) {
+      const category = categories[field.listField.entityCategory]
+      const item = category.items?.[x.code] ?? null
+      if (item) return item.displayName
+      else return "None"
     }
     return "hmm..."
   }
@@ -312,6 +380,7 @@ function ListField(props: {
             Add
           </Button>
           <IconButton
+            disabled={selected < 0 || selected >= value.length}
             color="error"
             onClick={() => {
               if (selected < 0 || selected >= value.length) return
@@ -324,16 +393,32 @@ function ListField(props: {
             <Delete></Delete>
           </IconButton>
         </Box>
-        <List>
-          {value.map((x, i) => (
-            <ListItemButton
-              onClick={() => (selected == i ? setSelected(-1) : setSelected(i))}
-              selected={selected == i}
-            >
-              {getLabel(x)}
-            </ListItemButton>
-          ))}
-        </List>
+        <Divider />
+        {!value.length ? (
+          <Typography>
+            <em>List is empty</em>
+          </Typography>
+        ) : (
+          <List
+            sx={{
+              my: 2,
+              bgcolor: "#eee",
+              maxHeight: "20rem",
+              overflowY: "auto",
+            }}
+          >
+            {value.map((x, i) => (
+              <ListItemButton
+                onClick={() =>
+                  selected == i ? setSelected(-1) : setSelected(i)
+                }
+                selected={selected == i}
+              >
+                {getLabel(x)}
+              </ListItemButton>
+            ))}
+          </List>
+        )}
         {selected >= 0 ? (
           <Field
             //   value={(value as any[])[]}

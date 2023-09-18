@@ -68,7 +68,7 @@ function MainBar(props: {
 }) {
   const { categories } = props
   return (
-    <AppBar color="inherit">
+    <AppBar color="secondary" sx={{ backdropFilter: "blur(20px)" }}>
       <Toolbar>
         <Box
           sx={{ gap: 3, display: "flex", width: 1, justifyContent: "center" }}
