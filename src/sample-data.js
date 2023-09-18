@@ -575,7 +575,7 @@ export default {
       img: "",
     },
   ],
-  commodities: [
+  commoditys: [
     {
       target: 0,
       quantity: 0,

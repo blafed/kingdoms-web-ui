@@ -124,11 +124,11 @@ function ItemsListView(props: {
           Add
         </Button>
         <Box flexGrow={1} />
-        <IconButton color="error">
+        <IconButton disabled color="error">
           <Delete />
         </IconButton>
       </Toolbar>
-      <Divider sx={{ my: 2 }}>Items</Divider>
+      <Divider sx={{ my: 2 }}>List</Divider>
       <List sx={{ minHeight: "80vh", maxHeight: "80vh", overflowY: "auto" }}>
         {props.items.map((item, index) => {
           return (
