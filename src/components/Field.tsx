@@ -80,7 +80,7 @@ export default function Field(props: {
       )
 
     case FieldType.entity_id: {
-      const category = categories[field.entityCategory]
+      const category = categories[field.entityCategory ?? -1]
       const categoryItems = category.items
       console.log(field.entityCategory)
       console.log(category)
@@ -345,19 +345,20 @@ function ListField(props: {
   const getLabel = (x: any) => {
     if (!field.listField) return "NO LIS TYPE"
     if (field.listField?.type == FieldType.entity_id) {
-      const category = EntityCategory[field.listField?.entityCategory ?? 1]
-      const item = categories[field.listField.entityCategory].items?.[x] ?? null
+      const category = EntityCategory[field.listField?.entityCategory ?? -1]
+      const item =
+        categories[field.listField.entityCategory ?? -1].items?.[x] ?? null
       if (item) return item.displayName
       else return category
     }
     if (field.listField?.type == FieldType.entity_quantity) {
-      const category = categories[field.listField.entityCategory]
+      const category = categories[field.listField.entityCategory ?? -1]
       const item = category.items?.[x.code] ?? null
       if (item) return item.displayName + " " + x.quantity
       else return "None"
     }
     if (field.listField?.type == FieldType.entity_quantity_gain) {
-      const category = categories[field.listField.entityCategory]
+      const category = categories[field.listField.entityCategory ?? -1]
       const item = category.items?.[x.code] ?? null
       if (item) return item.displayName
       else return "None"
