@@ -15,28 +15,40 @@ import {
   FormLabel,
 } from "@mui/material"
 import { CategoryData, CategoryItem } from "../type"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useLayoutEffect, useState } from "react"
 import { apiUrl } from "../consts"
 import { Add, Delete } from "@mui/icons-material"
-import DetailsView from "./DetailsView"
+import { MainLayoutContext } from "./MainLayout"
+import Details from "./Details"
 export default function CategoryView(props: {
   hidden: boolean
   category: CategoryData
 }) {
-  const [items, setItems] = useState<CategoryItem[]>([])
+  //   const [items, setItems] = useState<CategoryItem[]>([])
   const [selected, setSelected] = useState<number>(0)
 
-  useEffect(() => {
+  const context = useContext(MainLayoutContext)
+
+  const items = props.category.items
+
+  useLayoutEffect(() => {
     fetch(apiUrl + "info/" + props.category.header.name)
       .then((res) => res.json())
-      .then((data) => setItems(data))
-  }, [props.category.header.name])
+      .then((data) => {
+        const categories = context.categories
+        const myCategoryIndex = categories.indexOf(props.category)
+        categories[myCategoryIndex].items = data
+        context.setCategories(categories)
+      })
+  }, [])
 
   const { category } = props
-  return (
-    <Box sx={{ px: 2, display: props.hidden ? "none" : "inline" }}>
-      <Header category={category} />
 
+  if (!items || !items[selected]) return <></>
+  return (
+    <Box sx={{ px: 2, display: props.hidden ? "none" : "inherit" }}>
+      <Header category={category} />
+      <Box sx={{ height: "1rem" }} />
       <Grid container spacing={2}>
         <Grid item xs={12} sm={5} md={3}>
           <ItemsListView
@@ -46,7 +58,12 @@ export default function CategoryView(props: {
           />
         </Grid>
         <Grid item xs={12} sm={7} md={9}>
-          <DetailsView category={props.category} item={items[selected]} />
+          <Details
+            itemIndex={selected}
+            category={category}
+            item={items[selected]}
+          />
+          {/* <DetailsView category={props.category} item={items[selected]} /> */}
         </Grid>
       </Grid>
     </Box>
@@ -56,7 +73,7 @@ export default function CategoryView(props: {
 function Header(props: { category: CategoryData }) {
   const { category } = props
   return (
-    <Paper sx={{ p: 2, my: 2 }}>
+    <Paper sx={{ p: 2 }}>
       <Box
         sx={{
           w: 1,
@@ -95,7 +112,7 @@ function ItemsListView(props: {
         </IconButton>
       </Toolbar>
       <Divider sx={{ my: 2 }}>Items</Divider>
-      <List sx={{ maxHeight: "80vh", overflowY: "auto" }}>
+      <List sx={{ minHeight: "80vh", maxHeight: "80vh", overflowY: "auto" }}>
         {props.items.map((item, index) => {
           return (
             <ListItemButton

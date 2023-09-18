@@ -1,32 +1,63 @@
 import { AppBar, Box, Button, Toolbar } from "@mui/material"
 import CategoryView from "./CategoryView"
 import { CategoryData } from "../type"
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 import { apiUrl } from "../consts"
+import { createContext } from "react"
+
+const mainContextDefaultValue = {
+  categories: [] as CategoryData[],
+  categoryIndex: 0,
+  setCategoryIndex: (index: number) => {
+    return
+  },
+
+  setCategories: (categories: CategoryData[]) => {
+    return
+  },
+}
+export const MainLayoutContext = createContext<typeof mainContextDefaultValue>(
+  mainContextDefaultValue
+)
 
 export default function MainLayout() {
   const [categories, setCategories] = useState<CategoryData[]>([])
   const [categoryIndex, setCategoryIndex] = useState(0)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetch(apiUrl + "info/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data))
   }, [])
-  return (
-    <Box>
-      <MainBar
-        selected={categoryIndex}
-        onChange={(x) => setCategoryIndex(x)}
-        categories={categories}
-      />
 
-      <Box sx={{ mt: 8 }}>
-        {categories.length && (
-          <CategoryView category={categories[categoryIndex]} />
-        )}
+  if (categories.length == 0) return <></>
+  return (
+    <MainLayoutContext.Provider
+      value={{
+        categories,
+        categoryIndex,
+        setCategoryIndex,
+        setCategories: setCategories,
+      }}
+    >
+      <Box>
+        <MainBar
+          selected={categoryIndex}
+          onChange={(x) => setCategoryIndex(x)}
+          categories={categories}
+        />
+
+        <Box sx={{ mt: 8 }}>
+          {categories.map((category, index) => (
+            <CategoryView
+              key={index}
+              hidden={categoryIndex != index}
+              category={category}
+            />
+          ))}
+        </Box>
       </Box>
-    </Box>
+    </MainLayoutContext.Provider>
   )
 }
 
