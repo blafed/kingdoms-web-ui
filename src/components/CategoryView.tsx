@@ -39,8 +39,13 @@ export default function CategoryView(props: {
   })
 
   useEffect(() => {
-    if (items) if (selected != 0 && !items[selected]) setSelected(0)
-  }, [selected])
+    if (items) {
+      if (selected < 0) setSelected(0)
+      else if (selected >= items.length) setSelected(items.length - 1)
+    } else {
+      setSelected(0)
+    }
+  }, [selected, items])
 
   useLayoutEffect(() => {
     if (!noApi) {
@@ -70,7 +75,6 @@ export default function CategoryView(props: {
   }, [])
 
   const { category } = props
-
   if (!items || !items[selected]) return <></>
   return (
     <Box sx={{ px: 2, display: props.hidden ? "none" : "inherit" }}>

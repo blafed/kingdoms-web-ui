@@ -836,6 +836,7 @@ function ImageField(props: { value: string; onChange: (v: string) => void }) {
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Button onClick={handlePickClick}>Pick Image</Button>
           <IconButton
+            disabled={!props.value}
             onClick={() => {
               onFileChange(null)
               props.onChange("")

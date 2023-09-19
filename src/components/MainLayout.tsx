@@ -32,7 +32,13 @@ export default function MainLayout() {
     if (!noApi) {
       fetch(apiUrl + "info/categories")
         .then((res) => res.json())
-        .then((data) => setCategories(data))
+        .then((data) => {
+          //iterate over keys of data and add an empty items array to each category
+          Object.keys(data).forEach((key) => {
+            data[key].items = []
+          })
+          setCategories(data)
+        })
     } else {
       setCategories(sampleCategories as CategoryData[])
     }
