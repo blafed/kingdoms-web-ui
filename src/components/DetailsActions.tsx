@@ -1,4 +1,11 @@
-import { CopyAll, ContentPaste, Undo, Save, Add } from "@mui/icons-material"
+import {
+  CopyAll,
+  ContentPaste,
+  Undo,
+  Save,
+  Add,
+  ContentCopy,
+} from "@mui/icons-material"
 import { Box, Typography, ButtonGroup, Button } from "@mui/material"
 
 export default function DetailsActions(props: {
@@ -26,7 +33,7 @@ export default function DetailsActions(props: {
         This element has been changed, to apply the changes click save
       </Typography>
       <ButtonGroup>
-        <Button onClick={props.handleDuplicate} startIcon={<Add />}>
+        <Button onClick={props.handleDuplicate} startIcon={<ContentCopy />}>
           Duplicate
         </Button>
         <Button onClick={props.handleCopy} startIcon={<CopyAll />}>

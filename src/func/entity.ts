@@ -18,6 +18,7 @@ export async function saveEnttiy(
         mainContext.categories[category].header.name +
         "/" +
         entity.code +
+        "-" +
         randomString(16) +
         ".png"
     )

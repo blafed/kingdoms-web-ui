@@ -25,7 +25,9 @@ import { FieldInfo, FieldType, EntityCategory } from "../type"
 import { CategoryItemContext } from "./Details"
 import { MainLayoutContext } from "./MainLayout"
 import {
+  Add,
   Category,
+  ContentCopy,
   Delete,
   Expand,
   ExpandLess,
@@ -96,6 +98,7 @@ export default function Field(props: {
     case FieldType.text:
       return (
         <TextField
+          fullWidth
           label={label}
           helperText={field.help}
           value={value}
@@ -106,6 +109,7 @@ export default function Field(props: {
     case FieldType.textarea:
       return (
         <TextField
+          fullWidth
           multiline
           minRows={2}
           label={label}
@@ -263,6 +267,7 @@ export default function Field(props: {
     case FieldType.rate:
       return (
         <TextField
+          fullWidth
           label={label}
           type="number"
           value={value}
@@ -347,7 +352,7 @@ export default function Field(props: {
               onChange={(v) => setValue({ ...value, rate: v / 60 })}
               field={{
                 name: "",
-                label: "Rate (per min)",
+                label: "Rate (per minute)",
                 type: FieldType.rate,
               }}
             />
@@ -466,35 +471,170 @@ export default function Field(props: {
       )
     }
 
-    // case FieldType.resource_effect:
-    //   return (
-    //     <Box
-    //       sx={{
-    //         display: "flex",
-    //         w: 1,
-    //         justifyContent: "center",
-    //         alignItems: "center",
-    //       }}
-    //     >
-    //       <Field />
-    //     </Box>
-    //   )
-    //   break
+    case FieldType.fighting_stats: {
+      type FightingProps = {
+        offense: number
+        spy: number
+      }
+      const attack = value.attack ?? ({} as FightingProps)
+      const defense = value.defense ?? ({} as FightingProps)
+      return (
+        <Box>
+          <InputLabel>{label}</InputLabel>
+          {[""]}
 
-    //     case FieldType.list:
-    //       return (
-    //         <Box sx={{}}>
-    //           <Typography>{label}</Typography>
-    //           <List sx={{ maxHeight: "10rem" }}>
-    //             {(value as any[]).map((x) => (
-    //               <ListItemButton>{x}</ListItemButton>
-    //             ))}
-    //           </List>
-    //           <Button startIcon={<Add></Add>}></Button>
-    //           <Typography variant="subtitle1">{field.help}</Typography>
-    //         </Box>
-    //       )
-    //       break
+          <Box
+            sx={{
+              mt: 2,
+              gap: 1,
+              display: "flex",
+              justifyContent: "center",
+              aligntItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            {["offense", "spy"].map((cat: string) => {
+              return (
+                <Box
+                  sx={{
+                    gap: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                    aligntItems: "center",
+                  }}
+                >
+                  <Field
+                    field={{
+                      name: "",
+                      label: cat + " attack",
+                      type: FieldType.integer,
+                    }}
+                    onChange={(v) =>
+                      setValue({
+                        ...value,
+                        attack: { ...attack, [cat]: v },
+                      })
+                    }
+                    value={attack[cat]}
+                  />
+
+                  <Field
+                    field={{
+                      name: "",
+                      label: cat + " Defense",
+                      type: FieldType.integer,
+                    }}
+                    onChange={(v) =>
+                      setValue({
+                        ...value,
+                        defense: { ...defense, [cat]: v },
+                      })
+                    }
+                    value={defense[cat]}
+                  />
+                </Box>
+              )
+            })}
+          </Box>
+          <FormHelperText>{field.help}</FormHelperText>
+        </Box>
+      )
+    }
+
+    case FieldType.resource_effect:
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            w: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Field
+            field={{
+              name: "",
+              label: "Resource",
+              type: FieldType.entity_id,
+              entityCategory: EntityCategory.Resource,
+            }}
+            value={value?.resource ?? 0}
+            onChange={(v) => setValue({ ...value, code: v })}
+          />
+          <Field
+            field={{
+              name: "",
+              label: "Operation",
+              type: FieldType.select,
+              selectItems: ["Add", "Multiply", "Set"],
+              selectValues: [0, 1, 2],
+            }}
+            onChange={(v) => setValue({ ...value, op: v })}
+            value={value?.op ?? 0}
+          />
+          <Field
+            field={{
+              name: "",
+              label: "Amount",
+              type: FieldType.number,
+            }}
+            value={value?.amount ?? 0}
+            onChange={(v) => setValue({ ...value, amount: v })}
+          />
+        </Box>
+      )
+      break
+
+    case FieldType.time_duration: {
+      const [timeUnit, setTimeUnit] = useState<number>(3600)
+      return (
+        <Box>
+          <InputLabel>{label}</InputLabel>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 1,
+            }}
+          >
+            <Box sx={{ flexGrow: 1 }}>
+              <Field
+                field={{
+                  name: "",
+                  type: FieldType.rate,
+                }}
+                value={value / timeUnit}
+                onChange={(v) => setValue(v * timeUnit)}
+              />
+            </Box>
+            <Box sx={{ flexGrow: 1 }}>
+              <Field
+                field={{
+                  name: "",
+                  label: "Time Unit",
+                  type: FieldType.select,
+                  selectItems: [
+                    "Second",
+                    "Minute",
+                    "Hour",
+                    "Day",
+                    "Week",
+                    "Month",
+                    "Year",
+                  ],
+
+                  selectValues: [1, 60, 3600, 86400, 604800, 2592000, 31536000],
+                }}
+                value={timeUnit}
+                onChange={(v) => setTimeUnit(v)}
+              />
+            </Box>
+          </Box>
+          <FormHelperText>{field.help}</FormHelperText>
+        </Box>
+      )
+    }
   }
 }
 
@@ -529,6 +669,14 @@ function ListField(props: {
       if (item) return item.displayName
       else return "None"
     }
+    if (field.listField?.type == FieldType.resource_effect) {
+      const category = categories[field.listField.entityCategory ?? -1]
+      const item = category.items?.[x.code] ?? null
+      if (item) {
+        const op = ["+", "*", "="]
+        return item.displayName + " " + op[x.op] + " " + x.amount
+      } else return "None"
+    }
     return "hmm..."
   }
 
@@ -546,11 +694,24 @@ function ListField(props: {
             <Button
               onClick={() => {
                 const newValue = [...value]
-                newValue.push({})
+                if (value.length > 0) newValue.push(value[value.length - 1])
+                else newValue.push({})
                 setValue(newValue)
               }}
+              startIcon={<Add />}
             >
               Add
+            </Button>
+            <Button
+              disabled={selected < 0 || selected >= value.length}
+              onClick={() => {
+                const newValue = [...value]
+                newValue.push(value[selected])
+                setValue(newValue)
+              }}
+              startIcon={<ContentCopy />}
+            >
+              Duplicate
             </Button>
             <IconButton
               disabled={selected < 0 || selected >= value.length}
@@ -592,7 +753,7 @@ function ListField(props: {
               ))}
             </List>
           )}
-          {selected >= 0 ? (
+          {selected >= 0 && value.length > 0 ? (
             <Field
               //   value={(value as any[])[]}
               field={field.listField as FieldInfo}

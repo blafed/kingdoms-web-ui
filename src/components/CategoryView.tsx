@@ -13,6 +13,7 @@ import {
   Breadcrumbs,
   TextField,
   FormLabel,
+  Alert,
 } from "@mui/material"
 import { CategoryData, CategoryItem } from "../type"
 import { useContext, useEffect, useLayoutEffect, useState } from "react"
@@ -32,6 +33,14 @@ export default function CategoryView(props: {
   const context = useContext(MainLayoutContext)
 
   const items = props.category.items
+
+  useEffect(() => {
+    console.log(category, items)
+  })
+
+  useEffect(() => {
+    if (items) if (selected != 0 && !items[selected]) setSelected(0)
+  }, [selected])
 
   useLayoutEffect(() => {
     if (!noApi) {
@@ -91,8 +100,9 @@ export default function CategoryView(props: {
 function Header(props: { category: CategoryData }) {
   const { category } = props
   return (
-    <Paper sx={{ p: 2 }}>
-      <Box
+    // <Paper sx={{ p: 1, width: "fit-content", mx: "auto" }}>
+    <Alert variant="outlined" color="info">
+      {/* <Box
         sx={{
           w: 1,
           display: "flex",
@@ -100,16 +110,17 @@ function Header(props: { category: CategoryData }) {
           justifyContent: "center",
           alignItems: "center",
         }}
-      >
-        <Box sx={{}}>
-          <Typography variant="h4">{category.header.displayName}</Typography>
-        </Box>
-        <Box sx={{}}>
-          <Typography variant="h6">{category.header.description}</Typography>
-        </Box>
-        <Divider />
+      > */}
+      {/* <Box sx={{}}>
+        <Typography variant="h4">{category.header.displayName}</Typography>
+      </Box> */}
+      <Box sx={{}}>
+        <Typography variant="h6">{category.header.description}</Typography>
       </Box>
-    </Paper>
+      {/* <Divider /> */}
+      {/* </Box> */}
+    </Alert>
+    // </Paper>
   )
 }
 
