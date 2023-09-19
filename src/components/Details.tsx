@@ -1,41 +1,22 @@
-import {
-  Button,
-  ButtonGroup,
-  Divider,
-  FormControlLabel,
-  FormHelperText,
-  FormLabel,
-  List,
-  ListItemButton,
-  MenuItem,
-  Paper,
-  Select,
-  Switch,
-  TextField,
-  Typography,
-} from "@mui/material"
+import { Divider, Paper, Typography } from "@mui/material"
 import { Box, Stack } from "@mui/system"
-import {
-  CategoryData,
-  CategoryItem,
-  EntityCategory,
-  FieldInfo,
-  FieldType,
-} from "../type"
 import { createContext, useContext, useEffect, useState } from "react"
+import { CategoryData, CategoryItem, FieldInfo } from "../type"
 import { MainLayoutContext } from "./MainLayout"
-import { getDescendantProp, setDescendantProp } from "../utils/objectUtils"
-import { ContentPaste, CopyAll, Repeat, Save, Undo } from "@mui/icons-material"
 
-import Field from "./Field"
-import DetailsActions from "./DetailsActions"
 import { saveEnttiy } from "../func/entity"
+import DetailsActions from "./DetailsActions"
+import Field from "./Field"
 
 const defaultCategoryItemContext = {
   item: {} as CategoryItem,
   setItem: (item: CategoryItem) => {
-    return
+    if (item) return
   },
+  setFiles: (files: File[]) => {
+    if (files) return
+  },
+  files: [] as File[],
 }
 
 export const CategoryItemContext = createContext<
@@ -52,9 +33,11 @@ export default function Details(props: {
 
   const [hasChanged, setHasChanged] = useState(false)
   const [copy, setCopy] = useState<CategoryItem | null>(null)
+  const [files, setFiles] = useState<File[]>([])
 
   const handleSave = () => {
-    saveEnttiy(formItem, props.category.header.code, mainContext)
+    saveEnttiy(formItem, props.category.header.code, mainContext, files)
+    setFiles([])
   }
   const handleReset = () => {
     setFormItem(props.item)
@@ -90,6 +73,8 @@ export default function Details(props: {
   return (
     <CategoryItemContext.Provider
       value={{
+        files,
+        setFiles,
         item: formItem,
         setItem: (d: CategoryItem) => {
           setHasChanged(true)

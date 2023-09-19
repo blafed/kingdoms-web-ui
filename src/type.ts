@@ -52,6 +52,7 @@ type FieldInfo = {
   help?: string
   regex?: string
   selectValues?: number[]
+  selectItems?: string[]
   multiselectValues?: number[]
 
   minLength?: number

@@ -21,7 +21,7 @@ import { Add, Delete } from "@mui/icons-material"
 import { MainLayoutContext } from "./MainLayout"
 import Details from "./Details"
 import sampleData from "../sample-data"
-import { saveEnttiy } from "../func/entity"
+import { deleteEntity, saveEnttiy } from "../func/entity"
 export default function CategoryView(props: {
   hidden: boolean
   category: CategoryData
@@ -128,6 +128,11 @@ function ItemsListView(props: {
     }
     saveEnttiy(newEntity, mainContext.categoryIndex, mainContext)
   }
+
+  const handleDelete = () => {
+    deleteEntity(mainContext.categoryIndex, mainContext)
+  }
+
   return (
     <Paper sx={{ p: 1 }}>
       <Toolbar>
@@ -135,7 +140,11 @@ function ItemsListView(props: {
           Add
         </Button>
         <Box flexGrow={1} />
-        <IconButton disabled color="error">
+        <IconButton
+          onClick={handleDelete}
+          disabled={props.items.length <= 1}
+          color="error"
+        >
           <Delete />
         </IconButton>
       </Toolbar>

@@ -16,12 +16,21 @@ import {
   InputLabel,
   FormControl,
   Divider,
+  Grow,
+  Collapse,
+  ButtonBase,
 } from "@mui/material"
-import { useContext, useState } from "react"
+import { useContext, useRef, useState } from "react"
 import { FieldInfo, FieldType, EntityCategory } from "../type"
 import { CategoryItemContext } from "./Details"
 import { MainLayoutContext } from "./MainLayout"
-import { Category, Delete } from "@mui/icons-material"
+import {
+  Category,
+  Delete,
+  Expand,
+  ExpandLess,
+  ExpandMore,
+} from "@mui/icons-material"
 import { randomString } from "../utils/stringUtils"
 
 export default function Field(props: {
@@ -60,14 +69,19 @@ export default function Field(props: {
   switch (field.type) {
     case FieldType.code:
       return (
-        <TextField
-          label={label}
-          helperText={field.help}
-          disabled
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
+        <Typography textAlign={"center"}>
+          <em>Code </em> {value}
+        </Typography>
       )
+    // return (
+    //   <TextField
+    //     label={label}
+    //     helperText={field.help}
+    //     disabled
+    //     value={value}
+    //     onChange={(e) => setValue(e.target.value)}
+    //   />
+    // )
     // case FieldType.unique_name:
     //   return (
     //     <TextField
@@ -135,6 +149,7 @@ export default function Field(props: {
     case FieldType.number:
       return (
         <TextField
+          fullWidth
           label={label}
           helperText={field.help}
           type="number"
@@ -146,11 +161,19 @@ export default function Field(props: {
     case FieldType.integer:
       return (
         <TextField
+          fullWidth
           label={label}
           helperText={field.help}
           type="number"
-          value={value}
-          onChange={(e) => setValue(parseInt(e.target.value, 10))}
+          value={value + ""}
+          onChange={(e) =>
+            setValue(
+              Math.max(
+                Math.min(parseInt(e.target.value), 9007199254740991),
+                -9007199254740991
+              )
+            )
+          }
         />
       )
 
@@ -159,7 +182,7 @@ export default function Field(props: {
         <Box sx={{}}>
           <FormControlLabel
             labelPlacement="top"
-            label={label}
+            label={<InputLabel>{label}</InputLabel>}
             control={
               <Switch
                 value={value}
@@ -173,31 +196,42 @@ export default function Field(props: {
 
     case FieldType.point2:
       return (
-        <Box>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <TextField
-              type="number"
-              value={value.x}
-              label="X"
-              onChange={(e) =>
-                setValue({ ...value, x: parseInt(e.target.value, 10) })
-              }
-            />
-            <TextField
-              label="Y"
-              type="number"
-              value={value.y}
-              onChange={(e) =>
-                setValue({ ...value, y: parseInt(e.target.value, 10) })
-              }
-            />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <InputLabel>{label}</InputLabel>
+          <Box flexGrow={1} />
+          <Box>
+            <Box
+              sx={{
+                mt: 1,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <TextField
+                type="number"
+                value={value.x}
+                label="X"
+                onChange={(e) =>
+                  setValue({ ...value, x: parseInt(e.target.value, 10) })
+                }
+              />
+              <TextField
+                label="Y"
+                type="number"
+                value={value.y}
+                onChange={(e) =>
+                  setValue({ ...value, y: parseInt(e.target.value, 10) })
+                }
+              />
+            </Box>
+            <FormHelperText>{help}</FormHelperText>
           </Box>
-          <FormHelperText>{help}</FormHelperText>
         </Box>
       )
 
@@ -290,13 +324,14 @@ export default function Field(props: {
         <Box>
           <Box
             sx={{
+              gap: 1,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
             <Field
-              value={value.code}
+              value={value?.code ?? -1}
               onChange={(v) => setValue({ ...value, code: v })}
               field={{
                 name: "",
@@ -308,28 +343,39 @@ export default function Field(props: {
             />
 
             <Field
-              value={value.rate * 60}
+              value={value?.rate * 60 ?? 10}
               onChange={(v) => setValue({ ...value, rate: v / 60 })}
               field={{
                 name: "",
-                label: "Rate (per minute)",
+                label: "Rate (per min)",
                 type: FieldType.rate,
               }}
             />
-
+          </Box>
+          <Box
+            sx={{
+              mt: 1,
+              gap: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Field
-              value={value.limit}
+              value={value?.limit ?? 9007199254740991}
               onChange={(v) => setValue({ ...value, limit: v })}
               field={{
+                label: "Limit",
                 name: "",
                 type: FieldType.integer,
               }}
             />
 
             <Field
-              value={value.initialValue}
+              value={value.initialValue ?? 0}
               onChange={(v) => setValue({ ...value, initialValue: v })}
               field={{
+                label: "Initial value",
                 name: "",
                 type: FieldType.integer,
               }}
@@ -337,6 +383,103 @@ export default function Field(props: {
           </Box>
         </Box>
       )
+
+    case FieldType.select: {
+      const inputId = randomString(10)
+
+      return (
+        <FormControl sx={{ width: 1 }}>
+          <InputLabel id={inputId}>{label}</InputLabel>
+          <Select
+            label={field.label}
+            labelId={inputId}
+            fullWidth
+            onChange={(e) => setValue(e.target.value)}
+            value={value}
+          >
+            {field.selectItems?.map((x, i) => (
+              <MenuItem value={field.selectValues?.[i]}>{x}</MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>{field.help}</FormHelperText>
+        </FormControl>
+      )
+    }
+
+    case FieldType.multiselect: {
+      const inputId = randomString(10)
+
+      const array = [] as number[]
+
+      //check on all the flags of 'value', and add the checked flag to the array
+
+      for (let i = 0; i < 32; i++) {
+        const flag = 1 << i
+        if (value & flag) {
+          array.push(flag)
+        }
+      }
+
+      return (
+        <FormControl sx={{ width: 1 }}>
+          <InputLabel id={inputId}>{label}</InputLabel>
+          <Select
+            multiple
+            label={field.label}
+            labelId={inputId}
+            fullWidth
+            onChange={(e) => {
+              const intArray = e.target.value as number[]
+              console.log(intArray)
+              //convert 'value' to flags made of its elements, the combinging of all the flags will be the new value
+              let newValue = 0
+              for (let i = 0; i < intArray.length; i++) {
+                newValue |= intArray[i]
+              }
+              console.log(newValue)
+              setValue(newValue)
+            }}
+            value={array}
+          >
+            {field.selectItems?.map((x, i) => (
+              <MenuItem value={field.selectValues?.[i]}>{x}</MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>{field.help}</FormHelperText>
+        </FormControl>
+      )
+    }
+
+    case FieldType.img: {
+      return (
+        <Box
+          sx={{
+            disaply: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <InputLabel>{label}</InputLabel>
+          <ImageField value={value} onChange={(v) => setValue(v)} />
+          <FormHelperText>{field.help}</FormHelperText>
+        </Box>
+      )
+    }
+
+    // case FieldType.resource_effect:
+    //   return (
+    //     <Box
+    //       sx={{
+    //         display: "flex",
+    //         w: 1,
+    //         justifyContent: "center",
+    //         alignItems: "center",
+    //       }}
+    //     >
+    //       <Field />
+    //     </Box>
+    //   )
+    //   break
 
     //     case FieldType.list:
     //       return (
@@ -363,6 +506,7 @@ function ListField(props: {
   const { categories } = useContext(MainLayoutContext)
   const { value, field, onChange: setValue } = props
   const [selected, setSelected] = useState<number>(-1)
+  const [expanded, setExpanded] = useState<boolean>(true)
 
   const getLabel = (x: any) => {
     if (!field.listField) return "NO LIS TYPE"
@@ -371,7 +515,7 @@ function ListField(props: {
       const item =
         categories[field.listField.entityCategory ?? -1].items?.[x] ?? null
       if (item) return item.displayName
-      else return category
+      else return "None"
     }
     if (field.listField?.type == FieldType.entity_quantity) {
       const category = categories[field.listField.entityCategory ?? -1]
@@ -390,72 +534,157 @@ function ListField(props: {
 
   return (
     <Box>
-      <FormLabel>{field.label}</FormLabel>
-      <Paper sx={{ p: 1 }} variant="outlined">
-        <Box>
-          <Button
-            onClick={() => {
-              const newValue = [...value]
-              newValue.push({})
-              setValue(newValue)
-            }}
-          >
-            Add
-          </Button>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <InputLabel>{field.label}</InputLabel>
+        <IconButton onClick={() => setExpanded(!expanded)}>
+          {!expanded ? <ExpandMore /> : <ExpandLess />}
+        </IconButton>
+      </Box>
+      <Collapse in={expanded}>
+        <Paper sx={{ p: 1 }} variant="outlined">
+          <Box>
+            <Button
+              onClick={() => {
+                const newValue = [...value]
+                newValue.push({})
+                setValue(newValue)
+              }}
+            >
+              Add
+            </Button>
+            <IconButton
+              disabled={selected < 0 || selected >= value.length}
+              color="error"
+              onClick={() => {
+                if (selected < 0 || selected >= value.length) return
+                const newValue = [...value]
+                newValue.splice(selected, 1)
+                setValue(newValue)
+                if (newValue.length == 0) setSelected(-1)
+              }}
+            >
+              <Delete></Delete>
+            </IconButton>
+          </Box>
+          <Divider />
+          {!value.length ? (
+            <Typography>
+              <em>List is empty</em>
+            </Typography>
+          ) : (
+            <List
+              sx={{
+                my: 2,
+                bgcolor: "#eee",
+                maxHeight: "20rem",
+                overflowY: "auto",
+              }}
+            >
+              {value.map((x, i) => (
+                <ListItemButton
+                  onClick={() =>
+                    selected == i ? setSelected(i) : setSelected(i)
+                  }
+                  selected={selected == i}
+                >
+                  {getLabel(x)}
+                </ListItemButton>
+              ))}
+            </List>
+          )}
+          {selected >= 0 ? (
+            <Field
+              //   value={(value as any[])[]}
+              field={field.listField as FieldInfo}
+              value={value[selected]}
+              onChange={(v) => {
+                const newValue = [...value]
+                newValue[selected] = v
+                setValue(newValue)
+              }}
+            />
+          ) : null}
+        </Paper>
+      </Collapse>
+      <FormHelperText>{field.help}</FormHelperText>
+    </Box>
+  )
+}
+
+function ImageField(props: { value: string; onChange: (v: string) => void }) {
+  const categoryItemContext = useContext(CategoryItemContext)
+  const onFileChange = (file: File | null) => {
+    if (!file) categoryItemContext.setFiles([])
+    else categoryItemContext.setFiles([file])
+  }
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handlePickClick = () => {
+    inputRef.current?.click()
+  }
+
+  return (
+    <Box sx={{ display: "flex" }}>
+      <input
+        onChange={(e) => {
+          if (e.target.files) {
+            if (e.target.files.length) {
+              onFileChange(e.target.files[0])
+            }
+            e.target.files.length &&
+              props.onChange(URL.createObjectURL(e.target.files[0]))
+          }
+        }}
+        ref={inputRef}
+        type="file"
+        hidden
+        accept="image/*.png"
+      />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ButtonBase onClick={handlePickClick}>
+          <Box sx={{ height: "10rem", width: "10rem", bgcolor: "#eee" }}>
+            {props.value ? (
+              <Box sx={{ h: 1, w: 1, height: 1, width: 1 }}>
+                <img
+                  src={props.value}
+                  height={"100%"}
+                  width={"100%"}
+                  style={{ objectFit: "contain" }}
+                />
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  height: "100%",
+                  w: 1,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              ></Box>
+            )}
+          </Box>
+        </ButtonBase>
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Button onClick={handlePickClick}>Pick Image</Button>
           <IconButton
-            disabled={selected < 0 || selected >= value.length}
-            color="error"
             onClick={() => {
-              if (selected < 0 || selected >= value.length) return
-              const newValue = [...value]
-              newValue.splice(selected, 1)
-              setValue(newValue)
-              if (newValue.length == 0) setSelected(-1)
+              onFileChange(null)
+              props.onChange("")
             }}
+            color="error"
           >
             <Delete></Delete>
           </IconButton>
         </Box>
-        <Divider />
-        {!value.length ? (
-          <Typography>
-            <em>List is empty</em>
-          </Typography>
-        ) : (
-          <List
-            sx={{
-              my: 2,
-              bgcolor: "#eee",
-              maxHeight: "20rem",
-              overflowY: "auto",
-            }}
-          >
-            {value.map((x, i) => (
-              <ListItemButton
-                onClick={() =>
-                  selected == i ? setSelected(-1) : setSelected(i)
-                }
-                selected={selected == i}
-              >
-                {getLabel(x)}
-              </ListItemButton>
-            ))}
-          </List>
-        )}
-        {selected >= 0 ? (
-          <Field
-            //   value={(value as any[])[]}
-            field={field.listField as FieldInfo}
-            value={value[selected]}
-            onChange={(v) => {
-              const newValue = [...value]
-              newValue[selected] = v
-              setValue(newValue)
-            }}
-          />
-        ) : null}
-      </Paper>
-      <FormHelperText>{field.help}</FormHelperText>
+      </Box>
     </Box>
   )
 }
