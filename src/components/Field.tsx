@@ -695,7 +695,7 @@ function ListField(props: {
               onClick={() => {
                 const newValue = [...value]
                 if (value.length > 0) newValue.push(value[value.length - 1])
-                else newValue.push({})
+                else newValue.push(field.listField?.defaultValue ?? {})
                 setValue(newValue)
               }}
               startIcon={<Add />}

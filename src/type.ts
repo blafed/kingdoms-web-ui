@@ -64,12 +64,13 @@ type FieldInfo = {
   timeUnit?: TimeUnit
 
   entityCategory?: EntityCategory
+  defaultValue?: object | string | number | boolean
 }
 
 type CategoryData = {
   header: CategoryItem
   fields: FieldInfo[]
-  items?: CategoryItem[]
+  items: CategoryItem[]
 }
 
 type CategoryItem = {

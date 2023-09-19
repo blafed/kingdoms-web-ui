@@ -14,7 +14,7 @@ export async function saveEnttiy(
     console.log("will upload files")
     const storageRef = ref(
       storage,
-      "images/" +
+      "info/" +
         mainContext.categories[category].header.name +
         "/" +
         entity.code +
