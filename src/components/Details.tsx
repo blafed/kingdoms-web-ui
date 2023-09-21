@@ -113,7 +113,7 @@ export default function Details(props: {
   )
 }
 
-function FloatingActions(props: { show: false; onClick: () => void }) {
+function FloatingActions(props: { show: boolean; onClick: () => void }) {
   return (
     <Box sx={{ bottom: 20, right: 20, position: "fixed" }}>
       <Zoom in={props.show}>

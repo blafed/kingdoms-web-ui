@@ -120,10 +120,11 @@ export default function Field(props: {
       )
 
     case FieldType.entity_id: {
+      console.log("reloaded")
       const category = categories[field.entityCategory ?? -1]
       const categoryItems = category.items
-      console.log(field.entityCategory)
-      console.log(category)
+      // console.log(field.entityCategory)
+      // console.log(category)
 
       const inputId = randomString(10)
       return (
@@ -281,6 +282,10 @@ export default function Field(props: {
           value={{
             item: value ?? {},
             setItem: setValue,
+            setFiles: (files) => {
+              if (files) return
+            },
+            files: [],
           }}
         >
           <Box>
