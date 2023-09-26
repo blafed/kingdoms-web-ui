@@ -26,10 +26,8 @@ import { CategoryItemContext } from "./Details"
 import { MainLayoutContext } from "./MainLayout"
 import {
   Add,
-  Category,
   ContentCopy,
   Delete,
-  Expand,
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material"
@@ -51,7 +49,6 @@ export default function Field(props: {
 
   const value = props.value
 
-  const name = field.name
   //   const [name, setName] = useState(field.name)
   //   const value = item[name] as any
 
@@ -159,7 +156,11 @@ export default function Field(props: {
           helperText={field.help}
           type="number"
           value={value}
-          onChange={(e) => setValue(parseFloat(e.target.value))}
+          onChange={(e) => {
+            let num = parseFloat(e.target.value)
+            if (isNaN(num)) num = 0
+            setValue(num)
+          }}
         />
       )
 
@@ -170,19 +171,28 @@ export default function Field(props: {
           label={label}
           helperText={field.help}
           type="number"
-          value={value + ""}
-          onChange={(e) =>
-            setValue(
-              Math.max(
-                Math.min(parseInt(e.target.value), 9007199254740991),
-                -9007199254740991
-              )
+          value={value}
+          onChange={(e) => {
+            const eValue = e.target.value as string
+            let num = parseInt(e.target.value)
+            if (
+              eValue == "-" ||
+              eValue == "0-" ||
+              eValue.endsWith("-") ||
+              eValue == "-0"
             )
-          }
+              num = -1
+
+            if (isNaN(num)) num = 0
+            else if (num > 9007199254740991) num = 9007199254740991
+            else if (num < -9007199254740991) num = -9007199254740991
+
+            setValue(num)
+          }}
         />
       )
 
-    case FieldType.toggle:
+    case FieldType.toggle: {
       return (
         <Box sx={{}}>
           <FormControlLabel
@@ -191,13 +201,18 @@ export default function Field(props: {
             control={
               <Switch
                 value={value}
-                onChange={(e) => setValue(e.target.checked)}
+                checked={value === true}
+                onChange={(e) => {
+                  console.log(value)
+                  setValue(e.target.checked)
+                }}
               />
             }
           />
           <FormHelperText>{help}</FormHelperText>
         </Box>
       )
+    }
 
     case FieldType.point2:
       return (
@@ -707,7 +722,7 @@ function ListField(props: {
             >
               Add
             </Button>
-            <Button
+            {/* <Button
               disabled={selected < 0 || selected >= value.length}
               onClick={() => {
                 const newValue = [...value]
@@ -717,7 +732,7 @@ function ListField(props: {
               startIcon={<ContentCopy />}
             >
               Duplicate
-            </Button>
+            </Button> */}
             <IconButton
               disabled={selected < 0 || selected >= value.length}
               color="error"
