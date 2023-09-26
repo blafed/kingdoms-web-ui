@@ -30,7 +30,16 @@ export default function Details(props: {
   itemIndex: number
 }) {
   const mainContext = useContext(MainLayoutContext)
-  const [formItem, setFormItem] = useState<CategoryItem>(props.item)
+  const [formItem, _setFormItem] = useState<CategoryItem>(
+    JSON.parse(JSON.stringify(props.item)) as CategoryItem
+  )
+
+  const setFormItem = (item: CategoryItem) => {
+    // const json = JSON.stringify(item)
+    // const parsed = JSON.parse(json)
+    // _setFormItem(parsed)
+    _setFormItem(item)
+  }
 
   const [hasChanged, setHasChanged] = useState(false)
   const [copy, setCopy] = useState<CategoryItem | null>(null)
@@ -42,7 +51,7 @@ export default function Details(props: {
     setFiles([])
   }
   const handleReset = () => {
-    setFormItem(props.item)
+    setFormItem(JSON.parse(JSON.stringify(props.item)) as CategoryItem)
     setHasChanged(false)
   }
   const handleCopy = () => {
@@ -107,22 +116,30 @@ export default function Details(props: {
             </Stack>
           </Stack>
         </Box>
-        <FloatingActions show={hasChanged} onClick={handleSave} />
+        <FloatingActions
+          show={hasChanged}
+          onSave={handleSave}
+          onDiscard={handleReset}
+        />
       </Paper>
     </CategoryItemContext.Provider>
   )
 }
 
-function FloatingActions(props: { show: boolean; onClick: () => void }) {
+function FloatingActions(props: {
+  show: boolean
+  onSave: () => void
+  onDiscard: () => void
+}) {
   return (
     <Box sx={{ bottom: 20, right: 20, position: "fixed" }}>
       <Zoom in={props.show}>
         <Stack spacing={1}>
-          <Fab variant="extended" color="primary" onClick={props.onClick}>
+          <Fab variant="extended" color="primary" onClick={props.onSave}>
             <Save />
             Save
           </Fab>
-          <Fab variant="extended" color="warning" onClick={props.onClick}>
+          <Fab variant="extended" color="warning" onClick={props.onDiscard}>
             <Undo />
             Discard
           </Fab>
