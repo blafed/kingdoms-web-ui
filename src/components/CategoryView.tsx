@@ -86,6 +86,7 @@ export default function CategoryView(props: {
             selected={selected}
             onSelect={setSelected}
             items={items}
+            category={category}
           />
         </Grid>
         <Grid item xs={12} sm={7} md={9}>
@@ -130,6 +131,7 @@ function Header(props: { category: CategoryData }) {
 
 function ItemsListView(props: {
   selected: number
+  category: CategoryData
   items: CategoryItem[]
   onSelect: (index: number) => void
 }) {

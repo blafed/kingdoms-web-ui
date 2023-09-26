@@ -722,7 +722,7 @@ function ListField(props: {
             >
               Add
             </Button>
-            {/* <Button
+            <Button
               disabled={selected < 0 || selected >= value.length}
               onClick={() => {
                 const newValue = [...value]
@@ -732,7 +732,7 @@ function ListField(props: {
               startIcon={<ContentCopy />}
             >
               Duplicate
-            </Button> */}
+            </Button>
             <IconButton
               disabled={selected < 0 || selected >= value.length}
               color="error"

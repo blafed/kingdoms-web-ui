@@ -67,12 +67,6 @@ type FieldInfo = {
   defaultValue?: object | string | number | boolean
 }
 
-type CategoryData = {
-  header: CategoryItem
-  fields: FieldInfo[]
-  items: CategoryItem[]
-}
-
 type CategoryItem = {
   code: number
   name: string
@@ -83,6 +77,15 @@ type CategoryItem = {
   [key: string]: string | number | object | any[]
 }
 
+type CategoryData = {
+  header: CategoryHeader
+  fields: FieldInfo[]
+  items: CategoryItem[]
+}
+
+type CategoryHeader = CategoryItem & {
+  disallowAdding: boolean
+}
 type EntityInfo = {
   code: number
   name: string
